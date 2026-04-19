@@ -3,83 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CatatPro AI - Versi Stabil</title>
+    <title>CatatPro AI - Anti Dobel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        @keyframes pulse-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .recording { animation: pulse-red 1.5s infinite; color: #ef4444; }
-        #transcriptBox { scroll-behavior: smooth; }
-    </style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans">
 
     <div class="max-w-2xl mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-extrabold text-blue-700 mb-2 flex items-center justify-center gap-3">
-                <i class="fas fa-brain"></i> CatatPro AI
-            </h1>
-            <p class="text-gray-500">Rekam suara dan buat rangkuman otomatis.</p>
+            <h1 class="text-4xl font-extrabold text-blue-700 mb-2">🎙️ CatatPro AI</h1>
+            <p class="text-gray-500 text-sm">Versi Optimasi Android (Anti-Dobel)</p>
         </header>
 
-        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-white p-6 md:p-8">
+        <div class="bg-white rounded-3xl shadow-xl p-6 border border-white">
             <div class="flex justify-between items-center mb-6">
                 <div class="flex items-center gap-2">
                     <div id="statusDot" class="w-3 h-3 rounded-full bg-gray-300"></div>
-                    <span id="statusLabel" class="text-sm font-semibold text-gray-500 uppercase">Standby</span>
+                    <span id="statusLabel" class="text-xs font-bold text-gray-400 uppercase">Standby</span>
                 </div>
                 <div class="flex gap-2">
-                    <button id="startBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-bold shadow-lg transition-all">
-                        <i class="fas fa-play"></i> Mulai
-                    </button>
-                    <button id="stopBtn" class="bg-slate-800 hover:bg-black text-white px-6 py-2 rounded-full font-bold hidden transition-all">
-                        <i class="fas fa-stop"></i> Berhenti
-                    </button>
+                    <button id="startBtn" class="bg-blue-600 text-white px-5 py-2 rounded-full font-bold shadow-md active:scale-95">Mulai</button>
+                    <button id="stopBtn" class="bg-slate-800 text-white px-5 py-2 rounded-full font-bold hidden">Stop</button>
                 </div>
             </div>
 
-            <div id="transcriptBox" class="bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 min-h-[250px] max-h-[400px] overflow-y-auto text-gray-700 mb-6">
-                <p id="placeholderText" class="text-gray-400 italic">Klik mulai untuk merekam...</p>
-                <span id="finalText" class="inline"></span>
-                <span id="interimText" class="text-blue-400 inline"></span>
+            <div id="transcriptBox" class="bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 min-h-[300px] max-h-[450px] overflow-y-auto mb-6">
+                <div id="contentHolder" class="text-gray-700 leading-relaxed">
+                    <p id="placeholder" class="text-gray-400 italic">Klik Mulai untuk mencatat...</p>
+                </div>
+                <span id="interimText" class="text-blue-400 opacity-60 italic text-sm"></span>
             </div>
 
-            <button id="summarizeBtn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 active:scale-95">
-                <i class="fas fa-magic"></i> BUAT RANGKUMAN AI
+            <button id="summarizeBtn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95">
+                <i class="fas fa-magic mr-2"></i> BUAT RANGKUMAN AI
             </button>
         </div>
 
         <div id="resultArea" class="hidden mt-8">
-            <div class="bg-white p-8 rounded-3xl shadow-xl border-t-8 border-blue-600">
-                <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <i class="fas fa-feather-alt text-blue-600"></i> Hasil Catatan Cerdas
-                </h3>
-                <div id="aiResponse" class="whitespace-pre-wrap text-slate-700 leading-relaxed"></div>
-                <hr class="my-6">
-                <div class="flex justify-between mt-4">
-                    <button onclick="copyResult()" class="text-blue-600 font-bold">Salin</button>
-                    <button onclick="window.print()" class="text-gray-500">Cetak PDF</button>
-                </div>
+            <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-blue-600">
+                <h3 class="font-bold text-slate-800 mb-4 uppercase text-sm tracking-widest">✨ Hasil Rangkuman AI</h3>
+                <div id="aiResponse" class="whitespace-pre-wrap text-slate-700 leading-relaxed text-sm"></div>
+                <button onclick="copyResult()" class="mt-6 w-full py-2 bg-slate-100 rounded-xl font-bold text-blue-600 text-sm">Salin Catatan</button>
             </div>
         </div>
     </div>
 
     <script>
-        const API_KEY = "AIzaSyDnRMkhnpUXPOS9azh01iKq1Rj9Dd7qY2k"; 
-        
+        const API_KEY = "AIzaSyDnRMkhnpUXPOS9azh01iKq1Rj9Dd7qY2k";
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
-        const finalText = document.getElementById('finalText');
+        const contentHolder = document.getElementById('contentHolder');
         const interimText = document.getElementById('interimText');
         const statusLabel = document.getElementById('statusLabel');
         const statusDot = document.getElementById('statusDot');
         const summarizeBtn = document.getElementById('summarizeBtn');
         const aiResponse = document.getElementById('aiResponse');
         const resultArea = document.getElementById('resultArea');
-        const placeholderText = document.getElementById('placeholderText');
 
         let recognition;
         let isManualStop = false;
+        let finalSentences = new Set(); // Menggunakan Set agar teks yang sama persis tidak masuk 2x
 
         if ('webkitSpeechRecognition' in window) {
             recognition = new webkitSpeechRecognition();
@@ -89,34 +72,35 @@
 
             recognition.onstart = () => {
                 isManualStop = false;
-                statusLabel.innerText = "Mendengarkan...";
-                statusDot.className = "w-3 h-3 rounded-full bg-red-500 animate-ping";
+                statusLabel.innerText = "Listening...";
+                statusDot.className = "w-3 h-3 rounded-full bg-red-500 animate-pulse";
                 startBtn.classList.add('hidden');
                 stopBtn.classList.remove('hidden');
-                placeholderText.classList.add('hidden');
+                document.getElementById('placeholder').classList.add('hidden');
             };
 
             recognition.onresult = (event) => {
-                let interim = '';
+                let interimTranscript = '';
+                
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    let transcript = event.results[i][0].transcript.trim();
                     if (event.results[i].isFinal) {
-                        // Perbaikan: Hanya tambahkan jika kata terakhir berbeda (cegah dobel)
-                        let newText = event.results[i][0].transcript.trim();
-                        if (!finalText.innerText.endsWith(newText)) {
-                            finalText.innerText += newText + '. ';
+                        // FILTER ANTI DOBEL: Hanya masukkan jika kalimat belum ada di daftar
+                        if (!finalSentences.has(transcript)) {
+                            finalSentences.add(transcript);
+                            renderFinal();
                         }
                     } else {
-                        interim += event.results[i][0].transcript;
+                        interimTranscript = transcript;
                     }
                 }
-                interimText.innerText = interim;
-                document.getElementById('transcriptBox').scrollTop = document.getElementById('transcriptBox').scrollHeight;
+                interimText.innerText = interimTranscript;
             };
 
             recognition.onend = () => {
                 if (!isManualStop) recognition.start();
                 else {
-                    statusLabel.innerText = "Selesai";
+                    statusLabel.innerText = "Standby";
                     statusDot.className = "w-3 h-3 rounded-full bg-gray-300";
                     startBtn.classList.remove('hidden');
                     stopBtn.classList.add('hidden');
@@ -124,39 +108,49 @@
             };
         }
 
-        startBtn.onclick = () => { finalText.innerText = ""; recognition.start(); };
-        stopBtn.onclick = () => { isManualStop = true; recognition.stop(); };
+        function renderFinal() {
+            // Tampilkan semua kalimat unik yang sudah ditangkap
+            contentHolder.innerHTML = Array.from(finalSentences).join('. ') + '. ';
+            const box = document.getElementById('transcriptBox');
+            box.scrollTop = box.scrollHeight;
+        }
 
-        // PERBAIKAN ENDPOINT API GEMINI
+        startBtn.onclick = () => {
+            finalSentences.clear();
+            contentHolder.innerHTML = "";
+            recognition.start();
+        };
+
+        stopBtn.onclick = () => {
+            isManualStop = true;
+            recognition.stop();
+        };
+
         async function callGemini(fullText) {
-            // Kita pakai model gemini-1.5-flash tanpa embel-embel v1beta jika tidak diperlukan
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
-            
-            const prompt = `Tolong buat rangkuman sangat rapi dari transkrip ini. Pakai poin-poin. Teks: ${fullText}`;
+            const prompt = `Tolong rangkum teks rekaman suara ini menjadi catatan poin-poin yang rapi. Teks: ${fullText}`;
 
             try {
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }]
-                    })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
-
                 const data = await response.json();
-                if (data.error) return "Error: " + data.error.message;
                 return data.candidates[0].content.parts[0].text;
             } catch (error) {
-                return "Koneksi Gagal: " + error.message;
+                return "Error: Koneksi ke AI terputus.";
             }
         }
 
         summarizeBtn.onclick = async () => {
-            if (finalText.innerText.length < 10) return alert("Rekam suara dulu, Bro!");
-            summarizeBtn.disabled = true;
-            summarizeBtn.innerText = "Sedang Meringkas...";
+            const text = contentHolder.innerText;
+            if (text.length < 10) return alert("Belum ada teks!");
             
-            const res = await callGemini(finalText.innerText);
+            summarizeBtn.disabled = true;
+            summarizeBtn.innerText = "Meringkas...";
+            
+            const res = await callGemini(text);
             aiResponse.innerText = res;
             resultArea.classList.remove('hidden');
             summarizeBtn.disabled = false;
@@ -165,7 +159,7 @@
 
         function copyResult() {
             navigator.clipboard.writeText(aiResponse.innerText);
-            alert("Berhasil disalin!");
+            alert("Disalin!");
         }
     </script>
 </body>
