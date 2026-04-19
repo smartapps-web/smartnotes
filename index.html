@@ -3,164 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CatatPro AI - Anti Dobel</title>
+    <title>CatatPro AI - Fixed Model</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-slate-100 min-h-screen font-sans">
+<body class="bg-slate-100 min-h-screen p-4 font-sans text-slate-900">
 
-    <div class="max-w-2xl mx-auto p-4 md:p-8">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-extrabold text-blue-700 mb-2">🎙️ CatatPro AI</h1>
-            <p class="text-gray-500 text-sm">Versi Optimasi Android (Anti-Dobel)</p>
-        </header>
-
-        <div class="bg-white rounded-3xl shadow-xl p-6 border border-white">
-            <div class="flex justify-between items-center mb-6">
-                <div class="flex items-center gap-2">
-                    <div id="statusDot" class="w-3 h-3 rounded-full bg-gray-300"></div>
-                    <span id="statusLabel" class="text-xs font-bold text-gray-400 uppercase">Standby</span>
-                </div>
-                <div class="flex gap-2">
-                    <button id="startBtn" class="bg-blue-600 text-white px-5 py-2 rounded-full font-bold shadow-md active:scale-95">Mulai</button>
-                    <button id="stopBtn" class="bg-slate-800 text-white px-5 py-2 rounded-full font-bold hidden">Stop</button>
-                </div>
+    <div class="max-w-xl mx-auto space-y-4">
+        <div class="bg-white rounded-3xl shadow-xl p-6 border-b-4 border-blue-600">
+            <h1 class="text-2xl font-black text-blue-700 text-center mb-2 italic text-blue-600">🎙️ CATAT PRO AI</h1>
+            <p class="text-center text-[10px] text-gray-400 mb-6 uppercase tracking-widest font-bold">Stable Version 2.1</p>
+            
+            <div class="flex gap-2 mb-6 bg-slate-100 p-1 rounded-2xl">
+                <button id="tabMic" class="flex-1 py-2 rounded-xl font-bold text-xs bg-white text-blue-600 shadow-sm">MIC / MANUAL</button>
+                <button id="tabFile" class="flex-1 py-2 rounded-xl font-bold text-xs text-gray-500">IMPORT AUDIO</button>
             </div>
 
-            <div id="transcriptBox" class="bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 min-h-[300px] max-h-[450px] overflow-y-auto mb-6">
-                <div id="contentHolder" class="text-gray-700 leading-relaxed">
-                    <p id="placeholder" class="text-gray-400 italic">Klik Mulai untuk mencatat...</p>
+            <div id="sectionMic" class="space-y-4">
+                <div class="flex justify-between items-center text-[10px] font-black">
+                    <span id="status" class="px-3 py-1 bg-gray-100 rounded-full text-gray-400 uppercase">Standby</span>
+                    <div class="space-x-2">
+                        <button id="startBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">MULAI MIC</button>
+                        <button id="stopBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hidden">STOP</button>
+                    </div>
                 </div>
-                <span id="interimText" class="text-blue-400 opacity-60 italic text-sm"></span>
+                <textarea id="output" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 h-64 text-sm focus:outline-none" placeholder="Rekam suara atau ketik manual..."></textarea>
+                <button id="sumBtn" class="w-full bg-blue-700 text-white font-black py-4 rounded-2xl shadow-lg transform active:scale-95 transition-all">
+                    RANGKUM SEKARANG
+                </button>
             </div>
 
-            <button id="summarizeBtn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95">
-                <i class="fas fa-magic mr-2"></i> BUAT RANGKUMAN AI
-            </button>
+            <div id="sectionFile" class="hidden space-y-4">
+                <div class="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center bg-slate-50">
+                    <i class="fas fa-file-audio text-4xl text-slate-300 mb-2"></i>
+                    <input type="file" id="audioInput" accept="audio/*" class="hidden">
+                    <button onclick="document.getElementById('audioInput').click()" class="bg-white border px-6 py-2 rounded-xl font-bold text-sm shadow-sm">PILIH FILE</button>
+                    <p id="fileName" class="mt-3 text-xs text-blue-500 font-bold truncate px-4"></p>
+                </div>
+                <button id="uploadBtn" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-lg transform active:scale-95 transition-all">
+                    PROSES AUDIO
+                </button>
+            </div>
         </div>
 
-        <div id="resultArea" class="hidden mt-8">
-            <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-blue-600">
-                <h3 class="font-bold text-slate-800 mb-4 uppercase text-sm tracking-widest">✨ Hasil Rangkuman AI</h3>
-                <div id="aiResponse" class="whitespace-pre-wrap text-slate-700 leading-relaxed text-sm"></div>
-                <button onclick="copyResult()" class="mt-6 w-full py-2 bg-slate-100 rounded-xl font-bold text-blue-600 text-sm">Salin Catatan</button>
-            </div>
+        <div id="resArea" class="hidden bg-white p-6 rounded-3xl shadow-xl border-t-8 border-green-500">
+            <h3 class="font-black text-gray-800 mb-3 text-sm">📌 HASIL RANGKUMAN:</h3>
+            <div id="aiOut" class="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap bg-slate-50 p-4 rounded-xl"></div>
+            <button onclick="copyResult()" class="mt-4 w-full py-2 bg-slate-100 rounded-lg text-xs font-bold text-slate-500">SALIN TEKS</button>
         </div>
     </div>
 
     <script>
-        const API_KEY = "AIzaSyDnRMkhnpUXPOS9azh01iKq1Rj9Dd7qY2k";
-        const startBtn = document.getElementById('startBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const contentHolder = document.getElementById('contentHolder');
-        const interimText = document.getElementById('interimText');
-        const statusLabel = document.getElementById('statusLabel');
-        const statusDot = document.getElementById('statusDot');
-        const summarizeBtn = document.getElementById('summarizeBtn');
-        const aiResponse = document.getElementById('aiResponse');
-        const resultArea = document.getElementById('resultArea');
+        const KEY = "AIzaSyDnRMkhnpUXPOS9azh01iKq1Rj9Dd7qY2k";
+        
+        // Tab Switcher
+        const tabMic = document.getElementById('tabMic'); const tabFile = document.getElementById('tabFile');
+        const sectionMic = document.getElementById('sectionMic'); const sectionFile = document.getElementById('sectionFile');
+        tabMic.onclick = () => { sectionMic.classList.remove('hidden'); sectionFile.classList.add('hidden'); tabMic.className = "flex-1 py-2 rounded-xl font-bold text-xs bg-white text-blue-600 shadow-sm"; tabFile.className = "flex-1 py-2 rounded-xl font-bold text-xs text-gray-500"; };
+        tabFile.onclick = () => { sectionFile.classList.remove('hidden'); sectionMic.classList.add('hidden'); tabFile.className = "flex-1 py-2 rounded-xl font-bold text-xs bg-white text-blue-600 shadow-sm"; tabMic.className = "flex-1 py-2 rounded-xl font-bold text-xs text-gray-500"; };
 
-        let recognition;
-        let isManualStop = false;
-        let finalSentences = new Set(); // Menggunakan Set agar teks yang sama persis tidak masuk 2x
-
+        // Mic Logic
+        let recognition; let isStopped = true; const output = document.getElementById('output');
         if ('webkitSpeechRecognition' in window) {
-            recognition = new webkitSpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = 'id-ID';
-
-            recognition.onstart = () => {
-                isManualStop = false;
-                statusLabel.innerText = "Listening...";
-                statusDot.className = "w-3 h-3 rounded-full bg-red-500 animate-pulse";
-                startBtn.classList.add('hidden');
-                stopBtn.classList.remove('hidden');
-                document.getElementById('placeholder').classList.add('hidden');
-            };
-
-            recognition.onresult = (event) => {
-                let interimTranscript = '';
-                
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    let transcript = event.results[i][0].transcript.trim();
-                    if (event.results[i].isFinal) {
-                        // FILTER ANTI DOBEL: Hanya masukkan jika kalimat belum ada di daftar
-                        if (!finalSentences.has(transcript)) {
-                            finalSentences.add(transcript);
-                            renderFinal();
-                        }
-                    } else {
-                        interimTranscript = transcript;
+            recognition = new webkitSpeechRecognition(); recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'id-ID';
+            recognition.onresult = (e) => {
+                let final = "";
+                for (let i = e.resultIndex; i < e.results.length; ++i) {
+                    if (e.results[i].isFinal) {
+                        let txt = e.results[i][0].transcript.trim();
+                        if (!output.value.includes(txt)) output.value += txt + ". ";
                     }
                 }
-                interimText.innerText = interimTranscript;
             };
-
-            recognition.onend = () => {
-                if (!isManualStop) recognition.start();
-                else {
-                    statusLabel.innerText = "Standby";
-                    statusDot.className = "w-3 h-3 rounded-full bg-gray-300";
-                    startBtn.classList.remove('hidden');
-                    stopBtn.classList.add('hidden');
-                }
-            };
+            recognition.onstart = () => { isStopped = false; document.getElementById('status').innerText = "RECORDING..."; document.getElementById('startBtn').classList.add('hidden'); document.getElementById('stopBtn').classList.remove('hidden'); };
+            recognition.onend = () => { if (!isStopped) recognition.start(); };
         }
+        document.getElementById('startBtn').onclick = () => { output.value = ""; recognition.start(); };
+        document.getElementById('stopBtn').onclick = () => { isStopped = true; recognition.stop(); document.getElementById('status').innerText = "STANDBY"; document.getElementById('startBtn').classList.remove('hidden'); document.getElementById('stopBtn').classList.add('hidden'); };
 
-        function renderFinal() {
-            // Tampilkan semua kalimat unik yang sudah ditangkap
-            contentHolder.innerHTML = Array.from(finalSentences).join('. ') + '. ';
-            const box = document.getElementById('transcriptBox');
-            box.scrollTop = box.scrollHeight;
-        }
-
-        startBtn.onclick = () => {
-            finalSentences.clear();
-            contentHolder.innerHTML = "";
-            recognition.start();
-        };
-
-        stopBtn.onclick = () => {
-            isManualStop = true;
-            recognition.stop();
-        };
-
-        async function callGemini(fullText) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
-            const prompt = `Tolong rangkum teks rekaman suara ini menjadi catatan poin-poin yang rapi. Teks: ${fullText}`;
-
+        // CORE AI FUNCTION (FIXED)
+        async function askGemini(parts) {
+            // PAKAI v1beta dengan model flash-latest
+            const api = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${KEY}`;
             try {
-                const response = await fetch(url, {
+                const response = await fetch(api, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    body: JSON.stringify({ contents: [{ parts: parts }] })
                 });
                 const data = await response.json();
-                return data.candidates[0].content.parts[0].text;
-            } catch (error) {
-                return "Error: Koneksi ke AI terputus.";
-            }
+                if (data.candidates) return data.candidates[0].content.parts[0].text;
+                return "AI Error: " + (data.error ? data.error.message : "Coba lagi nanti.");
+            } catch (e) { return "Koneksi Gagal: " + e.message; }
         }
 
-        summarizeBtn.onclick = async () => {
-            const text = contentHolder.innerText;
-            if (text.length < 10) return alert("Belum ada teks!");
-            
-            summarizeBtn.disabled = true;
-            summarizeBtn.innerText = "Meringkas...";
-            
-            const res = await callGemini(text);
-            aiResponse.innerText = res;
-            resultArea.classList.remove('hidden');
-            summarizeBtn.disabled = false;
-            summarizeBtn.innerText = "BUAT RANGKUMAN AI";
+        // Action Buttons
+        document.getElementById('sumBtn').onclick = async () => {
+            const txt = output.value.trim();
+            if (txt.length < 5) return alert("Isi teks dulu!");
+            document.getElementById('sumBtn').innerText = "MENGANALISA...";
+            const res = await askGemini([{ text: "Rangkum teks kajian ini jadi poin-poin rapi: " + txt }]);
+            document.getElementById('aiOut').innerText = res;
+            document.getElementById('resArea').classList.remove('hidden');
+            document.getElementById('sumBtn').innerText = "RANGKUM SEKARANG";
         };
 
-        function copyResult() {
-            navigator.clipboard.writeText(aiResponse.innerText);
-            alert("Disalin!");
-        }
+        const audioInput = document.getElementById('audioInput');
+        audioInput.onchange = () => { document.getElementById('fileName').innerText = audioInput.files[0].name; };
+        
+        document.getElementById('uploadBtn').onclick = async () => {
+            if (!audioInput.files[0]) return alert("Pilih file!");
+            document.getElementById('uploadBtn').innerText = "MEMPROSES AUDIO...";
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const base64 = reader.result.split(',')[1];
+                const res = await askGemini([
+                    { text: "Tolong transkrip dan rangkum audio ini." },
+                    { inline_data: { mime_type: audioInput.files[0].type || "audio/mpeg", data: base64 } }
+                ]);
+                document.getElementById('aiOut').innerText = res;
+                document.getElementById('resArea').classList.remove('hidden');
+                document.getElementById('uploadBtn').innerText = "PROSES AUDIO";
+            };
+            reader.readAsDataURL(audioInput.files[0]);
+        };
+
+        function copyResult() { navigator.clipboard.writeText(document.getElementById('aiOut').innerText); alert("Disalin!"); }
     </script>
 </body>
 </html>
